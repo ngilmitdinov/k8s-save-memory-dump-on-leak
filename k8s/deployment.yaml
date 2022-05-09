@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: java-leak
+  name: java-leak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-leak
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: java-leak
+    spec:
+#      shareProcessNamespace: true
+      containers:
+      - image: noelfromitmo/java-leak:0.1.3
+        name: java-leak
+        resources:
+          requests:
+            memory: "30Mi"
+          limits:
+            memory: "150Mi"
+        volumeMounts:
+        - name: task-pv-volume
+          mountPath: /dumps/
+        imagePullPolicy: Always 
+        lifecycle:
+          preStop:
+            exec:
+             command: ["/bin/bash", "-c", "/app/jmap-entrypoint.sh"]
+        livenessProbe:
+          exec:
+            command:
+            - kubemem
+            - --failure
+            - "75" # Fail at 95% memory
+            - --logfile
+            - /proc/1/fd/1 # Write to PID 1's output, allowing logging
+          initialDelaySeconds: 5
+          periodSeconds: 5
+#      - image: noelfromitmo/java-leak:0.1.2
+#        name: jmap-sidecar
+#        imagePullPolicy: Always
+#        volumeMounts:
+#        - name: heap-dumps
+#          mountPath: /dumps
+#        command: ["/app/jmap-entrypoint.sh"]
+      terminationGracePeriodSeconds: 160
+      volumes:
+      - name: task-pv-volume
+        hostPath:
+          path: /data/pv0001/
+#        emptyDir: {}

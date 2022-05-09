@@ -29,6 +29,8 @@ applicationDefaultJvmArgs = [
         '-Xms32m',
         '-Xmx32m',
         '-XX:NativeMemoryTracking=detail',
+        '-XX:+HeapDumpOnOutOfMemoryError',
+        '-XX:HeapDumpPath=/dumps/oom.bin',
         '-Dlog4j.configurationFile=resources/log4j.properties'
 ]
 
