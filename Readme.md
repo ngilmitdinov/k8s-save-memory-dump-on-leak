@@ -14,8 +14,12 @@ References:
 
 This solution needs Persistent Volume for dump and liveness probe that fail container before k8s OOM, because k8s OOMKiller send SIGKILL (not SIGTERM) and PreStop hook didn't work.
 
+Problems:
+- needs physical volume
+- do not use default k8s OOMKiller and as a result rescheduling the pod
+
 References:
 - Liveness probe by: https://github.com/16Bitt/kubemem
 
-### 3. **WIP** Sidecar with Jmap.
+### 3. :hammer_and_wrench: **WIP** :hammer_and_wrench: Sidecar with Jmap. 
 This solutuion needs to sharing pid with namespaces
